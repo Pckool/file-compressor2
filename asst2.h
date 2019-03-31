@@ -32,10 +32,13 @@ void printTree(treeNode * head, int fd);
 void writeBook(treeNode * head, int fd);
 void llSort(fileList * fl);
 void swap(fileList * link1, fileList * link2);
+void sorter(fileList * fl);
 int getLen(int x);
 char * extract(char * path);
 char * mkPath(char * currentPath, char * nextDir);
 treeNode * fileIterator(char * name, treeNode * head);
 treeNode * tokenize(char * fileContents, treeNode * head, char * currentFile);
 
+char* concat(const char *s1, const char *s2);
+char* tabConcat(const char *s1, const char *s2);
 #endif
