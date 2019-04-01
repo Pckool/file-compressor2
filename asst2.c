@@ -670,8 +670,9 @@ MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
 
     MinHeap* minHeap = createMinHeap(size);
 		int i;
-    for (i = 0; i < size; ++i)
-        minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
+		minHeap->array = mhArray;
+    // for (i = 0; i < size; ++i)
+    //     minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
 
     minHeap->size = size;
     buildMinHeap(minHeap);
