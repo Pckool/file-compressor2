@@ -46,7 +46,6 @@ fileList * addToFileList(fileList * fl, fileList * newLink){
 treeNode * createNode(char * newStr){
 
 	treeNode * temp = (treeNode*)malloc(sizeof(treeNode));
-	printf("on ste yee\n");
 	temp->left = NULL;
 	temp->right = NULL;
 	temp->files = NULL;
@@ -506,7 +505,9 @@ unsigned countPaths(){
 }
 
 treeNode **toArray(treeNode *head, unsigned size){
+	printf("yoink: %i\n", size);
 	mhArray = (treeNode**)malloc(size * sizeof(treeNode*));
+	free(head);
 	getLeaf(head);
 
 }
@@ -561,7 +562,7 @@ treeNode* newNode(char *data, unsigned freq){
 	temp->str = strdup(data);
 	return temp;
 	printf("about to make the files thing\n");
-	fileList *fls = malloc(sizeof(fileList));
+	fileList *fls;
 	fls->fileName = NULL;
 	fls->counter = freq;
 	fls->next = NULL;
