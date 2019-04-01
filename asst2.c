@@ -669,8 +669,8 @@ int isLeaf(treeNode* root){
 MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
 
     MinHeap* minHeap = createMinHeap(size);
-
-    for (int i = 0; i < size; ++i)
+		int i;
+    for (i = 0; i < size; ++i)
         minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
 
     minHeap->size = size;
