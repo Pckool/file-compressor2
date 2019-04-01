@@ -506,7 +506,7 @@ unsigned countPaths(){
 
 treeNode **toArray(treeNode *head, unsigned size){
 	mhArray = (treeNode**)malloc(size * sizeof(treeNode*));
-	free(head);
+	//free(head);
 	getLeaf(head);
 
 }
@@ -550,17 +550,15 @@ treeNode *getLeaf(treeNode *head){
 
 #define MAX_TREE_HT 1000
 
-// A utility function allocate a new
-// min heap node with given string
-// and frequency of the string
+/**
+ 	* A utility function allocate a new min heap node with given string and frequency of the string
+	*/
 treeNode* newNode(char *data, unsigned freq){
 	treeNode * temp = (treeNode*)malloc(sizeof(treeNode));
-	printf("on ste yee\n");
 	temp->left = NULL;
 	temp->right = NULL;
 	temp->files = NULL;
 	temp->str = strdup(data);
-	printf("about to make the files thing\n");
 	fileList *fls = (fileList*)malloc(sizeof(fileList));
 	fls->fileName = NULL;
 	fls->counter = freq;
@@ -569,8 +567,9 @@ treeNode* newNode(char *data, unsigned freq){
   return temp;
 }
 
-// A utility function to create
-// a min heap of given capacity
+/**
+ 	* A utility function to create a min heap of given capacity
+	*/
 MinHeap* createMinHeap(unsigned capacity){
 
     MinHeap* minHeap = (MinHeap*)malloc(sizeof(MinHeap));
@@ -586,41 +585,46 @@ MinHeap* createMinHeap(unsigned capacity){
     return minHeap;
 }
 
-// A utility function to
-// swap two min heap nodes
+/**
+ 	* A utility function to swap two min heap nodes
+	*/
 void swapMinHeapNode(treeNode** a, treeNode** b){
 
     treeNode* t = *a;
     *a = *b;
     *b = t;
 }
-// The standard minHeapify function.
+/**
+ 	* The standard minHeapify function.
+	*/
 void minHeapify(MinHeap* minHeap,unsigned size, int idx){
-
+		printf("Minheapify init... \n");
     int smallest = idx;
     int left = 2 * idx + 1;
     int right = 2 * idx + 2;
-
-    if (left < size && minHeap->array[left]->files-> counter < minHeap->array[smallest]->files->counter)
-        smallest = left;
-
-    if (right < size && minHeap->array[right]->files-> counter < minHeap->array[smallest]->files->counter)
-        smallest = right;
-
+    if (left < size && minHeap->array[left]->files->counter < minHeap->array[smallest]->files->counter)
+      smallest = left;
+		printf("Minheapify if2... \n");
+    if (right < size && minHeap->array[right]->files->counter < minHeap->array[smallest]->files->counter)
+      smallest = right;
+		printf("Minheapify if3... \n");
     if (smallest != idx) {
-        swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
-        minHeapify(minHeap, size, smallest);
+			printf("The smallest is not the index; Recursing...\n");
+      swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
+      minHeapify(minHeap, size, smallest);
     }
 }
 
-// A utility function to check
-// if size of heap is 1 or not
+/**
+ 	* A utility function to check if size of heap is 1 or not
+	*/
 int isSizeOne(MinHeap* minHeap){
     return (minHeap->size == 1);
 }
 
-// A standard function to extract
-// minimum value node from heap
+/**
+ 	* A standard function to extract minimum value node from heap
+	*/
 treeNode* extractMin(MinHeap* minHeap){
 
     treeNode* temp = minHeap->array[0];
@@ -631,8 +635,9 @@ treeNode* extractMin(MinHeap* minHeap){
     return temp;
 }
 
-// A utility function to insert
-// a new node to Min Heap
+/**
+ 	* A utility function to insert a new node to Min Heap
+	*/
 void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode){
 
     ++minHeap->size;
@@ -647,18 +652,23 @@ void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode){
     minHeap->array[i] = minHeapNode;
 }
 
-// A standard funvtion to build min heap
+/**
+	* build min heap
+	*/
 void buildMinHeap(MinHeap* minHeap){
 
     int n = minHeap->size - 1;
     int i;
 
     for (i = (n - 1) / 2; i >= 0; --i){
+			printf("minheapifying... with %i\n", n);
       minHeapify(minHeap, minHeap->size, i);
 		}
 }
 
-// A utility function to print an array of size n
+/**
+ 	* A utility function to print an array of size n
+	*/
 void printArr(int arr[], int n){
     int i;
     for (i = 0; i < n; ++i)
@@ -667,23 +677,22 @@ void printArr(int arr[], int n){
     printf("\n");
 }
 
-// Utility function to check if this node is leaf
+/**
+ 	* Utility function to check if this node is leaf
+	*/
 int isLeaf(treeNode* root){
 
     return !(root->left) && !(root->right);
 }
 
-// Creates a min heap of capacity
-// equal to size and inserts all character of
-// data[] in min heap. Initially size of
-// min heap is equal to capacity
+/**
+	* Creates a min heap of capacity equal to size and inserts all character of data[] in min heap. Initially size of min heap is equal to capacity
+	*/
 MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
 
     MinHeap* minHeap = createMinHeap(size);
 		int i;
 		minHeap->array = mhArray;
-    // for (i = 0; i < size; ++i)
-    //     minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
 
     minHeap->size = size;
 		printf("building minheap...\n");
@@ -695,17 +704,12 @@ MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
 // The main function that builds Huffman tree
 treeNode* buildHuffmanTree(treeNode **arr, int size){
     treeNode *left, *right, *top;
-
-    // Step 1: Create a min heap of capacity
-    // equal to size.  Initially, there are
-    // modes equal to size.
+		// Make the minheap (array)
     MinHeap* minHeap = createAndBuildMinHeap(mhArray, size);
 
     // Iterate while size of heap doesn't become 1
     while (!isSizeOne(minHeap)) {
-
-        // Step 2: Extract the two minimum
-        // freq items from min heap
+        // Find the two minimum freq items from min heap
         left = extractMin(minHeap);
         right = extractMin(minHeap);
 
@@ -732,20 +736,20 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
 
 // Prints huffman codes from the root of Huffman Tree.
 // It uses arr[] to store codes
-void printCodes(treeNode* root, int arr[], int top){
+char *printCodes(treeNode* root, int arr[], int top, char *rslt){
 
     // Assign 0 to left edge and recur
     if (root->left) {
 
         arr[top] = 0;
-        printCodes(root->left, arr, top + 1);
+        printCodes(root->left, arr, top + 1, rslt);
     }
 
     // Assign 1 to right edge and recur
     if (root->right) {
 
         arr[top] = 1;
-        printCodes(root->right, arr, top + 1);
+        printCodes(root->right, arr, top + 1, rslt);
     }
 
     // If this is a leaf node, then
@@ -754,7 +758,7 @@ void printCodes(treeNode* root, int arr[], int top){
     // and its code from arr[]
     if (isLeaf(root)) {
 
-        printf("%s: ", root->str);
+        printf("%s\t\t", root->str);
         printArr(arr, top);
     }
 }
@@ -765,14 +769,15 @@ void printCodes(treeNode* root, int arr[], int top){
 	* @param fileNames an array of all of the file names in the dir
 	* @return NULL
 	*/
-void HuffmanCodes(unsigned size){
+char *HuffmanCodes(unsigned size){
     // Construct Huffman Tree
     treeNode* root = buildHuffmanTree(mhArray, size);
 
     // Print Huffman codes using the Huffman tree built above
     int arr[MAX_TREE_HT], top = 0;
+		char *rslt;
 
-    printCodes(root, arr, top);
+    return printCodes(root, arr, top, rslt);
 }
 
 /************************************************/

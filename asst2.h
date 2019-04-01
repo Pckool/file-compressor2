@@ -55,7 +55,7 @@ treeNode **toArray(treeNode *head, unsigned size);
 treeNode *getLeaf(treeNode *head);
 
 treeNode* newNode(char *data, unsigned freq);
-void HuffmanCodes(unsigned size);
+char *HuffmanCodes(unsigned size);
 MinHeap* createMinHeap(unsigned capacity);
 void swapMinHeapNode(treeNode** a, treeNode** b);
 void minHeapify(struct MinHeap* minHeap,unsigned size, int idx);
@@ -67,7 +67,7 @@ void printArr(int arr[], int n);
 int isLeaf(treeNode* root);
 MinHeap* createAndBuildMinHeap(treeNode **arr, int size);
 treeNode* buildHuffmanTree(treeNode **arr, int size);
-void printCodes(treeNode* root, int arr[], int top);
+char *printCodes(treeNode* root, int arr[], int top, char *rslt);
 
 
 char* concat(const char *s1, const char *s2);
