@@ -725,17 +725,11 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
  	* A utility function to print an array of size n
 	*/
 char *printArr(char arr[], int n, int fd){
-	char *send = (char*)malloc(30);
-    int i;
-    for (i = 0; i < n; ++i){
-
-
-			if(write(fd, &arr[i], sizeof(arr[i]) ) != sizeof(arr[i]) ){
-				char * err = "There was an error writing to\n";
-				printf("%s\n", err);
-			}
-
-			//printf("%s", temp);
+	char *send = "";
+  int i;
+  for (i = 0; i < n; ++i){
+		send = charAppend(send, arr[i]);
+		// printf("%c", arr[i]);
 			// send[i] = temp;
 			// if(send == NULL)
 			//
@@ -743,10 +737,16 @@ char *printArr(char arr[], int n, int fd){
 			//  	concat(send, temp);
       // printf("%d", arr[i]);
 		}
-		if(write(fd, "\n", 1 ) != 1 ){
-			char * err = "There was an error writing to\n";
-			printf("%s\n", err);
-		}
+		// printf("%s\n", send);
+
+		// if(write(fd, send, sizeof(send) ) != sizeof(send) ){
+		// 	char * err = "There was an error writing to\n";
+		// 	printf("%s\n", err);
+		// }
+		// if(write(fd, "\n", 1 ) != 1 ){
+		// 	char * err = "There was an error writing to\n";
+		// 	printf("%s\n", err);
+		// }
 		//printf("%s\n", send);
     //send = concat(send, "\n");
 		//printf("%s\n", send);
@@ -761,14 +761,14 @@ int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd){
     // Assign 0 to left edge and recur
     if (root->left) {
 
-        arr[top] = 0;
+        arr[top] = '0';
         printCodes(root->left, arr, top + 1, rslt, fd);
     }
 
     // Assign 1 to right edge and recur
     if (root->right) {
 
-        arr[top] = 1;
+        arr[top] = '1';
         printCodes(root->right, arr, top + 1, rslt, fd);
     }
 
@@ -780,13 +780,17 @@ int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd){
 			//printf("%s\n", printArr(arr, top));
 
 			rslt = concat(rslt, tabConcat(root->str, "\t") );
-			// rslt = concat(rslt, "\n");
+			char *code = printArr(arr, top, fd);
+			printf("%s\n", code);
+			rslt = concat(rslt, code);
+
+			rslt = concat(rslt, "\n");
 
 			if(write(fd, rslt, strlen(rslt)+1 ) != strlen(rslt)+1){
 				char * err = "There was an error writing to\n";
 				printf("%s\n", concat(err, root->str));
 			}
-			printArr(arr, top, fd);
+
 			//tabConcat(root->str, );
 			//free(temp);
 			free(rslt);
@@ -880,6 +884,14 @@ unsigned int getLeafCount(treeNode* head){
         c += getLeafCount(head->right);
         return c;
     }
+}
+
+char *charAppend(char str[], char charr){
+	char *newStr = malloc(strlen(str)+2);
+	strcpy(newStr, str);
+	newStr[strlen(str)] = charr;
+	newStr[strlen(str)+1] = '\0';
+	return newStr;
 }
 
 // char** addStringToArray(const char ** strArr, char * str){

@@ -74,4 +74,5 @@ char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);
 char* parseInt(const int num);
 unsigned int getLeafCount(treeNode* node);
+char *charAppend(char str[], char charr);
 #endif
