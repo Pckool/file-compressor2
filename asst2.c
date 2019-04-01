@@ -217,35 +217,35 @@ void writeBook(treeNode * head, int fd){
 
 	// sorter(ptr);
 	toArray(head, numWords);
-	HuffmanCodes(numWords);
+	HuffmanCodes(numWords, fd);
 
-	if(head->left != NULL){
-		writeBook(head->left, fd);
-	}
-
-	// printf("%s\n",head->str);
-	ptr = head->files;
-
-	while(ptr != NULL){
-		// printf("%s %d\n", ptr->fileName, ptr->counter);
-
-		char * line = tabConcat(ptr->fileName, head->str);
-		char * fullLine = concat(line, "\n");
-		// printf("line: %s\tsize: %i\n", line, strlen(line));
-
-		if(write(fd, fullLine, strlen(line)+1 ) != strlen(line)+1){
-			char * err = "There was an error writing to\n";
-			printf("%s\n", concat(err, ptr->fileName));
-		}
-		free(line);
-		free(fullLine);
-		ptr = ptr->next;
-	}
-
-	if(head->right != NULL)
-	{
-		writeBook(head->right, fd);
-	}
+	// if(head->left != NULL){
+	// 	writeBook(head->left, fd);
+	// }
+	//
+	// // printf("%s\n",head->str);
+	// ptr = head->files;
+	//
+	// while(ptr != NULL){
+	// 	// printf("%s %d\n", ptr->fileName, ptr->counter);
+	//
+	// 	char * line = tabConcat(ptr->fileName, head->str);
+	// 	char * fullLine = concat(line, "\n");
+	// 	// printf("line: %s\tsize: %i\n", line, strlen(line));
+	//
+	// 	if(write(fd, fullLine, strlen(line)+1 ) != strlen(line)+1){
+	// 		char * err = "There was an error writing to\n";
+	// 		printf("%s\n", concat(err, ptr->fileName));
+	// 	}
+	// 	free(line);
+	// 	free(fullLine);
+	// 	ptr = ptr->next;
+	// }
+	//
+	// if(head->right != NULL)
+	// {
+	// 	writeBook(head->right, fd);
+	// }
 }
 
 //Pulls all the data out of a given file designated by path
@@ -667,17 +667,6 @@ void buildMinHeap(MinHeap* minHeap){
 }
 
 /**
- 	* A utility function to print an array of size n
-	*/
-void printArr(int arr[], int n){
-    int i;
-    for (i = 0; i < n; ++i)
-        printf("%d", arr[i]);
-
-    printf("\n");
-}
-
-/**
  	* Utility function to check if this node is leaf
 	*/
 int isLeaf(treeNode* root){
@@ -720,12 +709,10 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
         // left and right children of this new node.
         // Add this node to the min heap
         // '$' is a special value for internal nodes, not used
-				printf("on step 3\n");
         top = newNode("$", left->files->counter + right->files->counter);
 
         top->left = left;
         top->right = right;
-			printf("inserting minheap\n");
       insertMinHeap(minHeap, top);
     }
 
@@ -734,32 +721,78 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
     return extractMin(minHeap);
 }
 
-// Prints huffman codes from the root of Huffman Tree.
-// It uses arr[] to store codes
-char *printCodes(treeNode* root, int arr[], int top, char *rslt){
+/**
+ 	* A utility function to print an array of size n
+	*/
+char *printArr(char arr[], int n, int fd){
+	char *send = (char*)malloc(30);
+    int i;
+    for (i = 0; i < n; ++i){
+
+
+			if(write(fd, &arr[i], sizeof(arr[i]) ) != sizeof(arr[i]) ){
+				char * err = "There was an error writing to\n";
+				printf("%s\n", err);
+			}
+
+			//printf("%s", temp);
+			// send[i] = temp;
+			// if(send == NULL)
+			//
+			// else
+			//  	concat(send, temp);
+      // printf("%d", arr[i]);
+		}
+		if(write(fd, "\n", 1 ) != 1 ){
+			char * err = "There was an error writing to\n";
+			printf("%s\n", err);
+		}
+		//printf("%s\n", send);
+    //send = concat(send, "\n");
+		//printf("%s\n", send);
+		return send;
+}
+
+/**
+	* Prints huffman codes from the root of Huffman Tree. It uses arr[] to store codes
+	*/
+int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd){
 
     // Assign 0 to left edge and recur
     if (root->left) {
 
         arr[top] = 0;
-        printCodes(root->left, arr, top + 1, rslt);
+        printCodes(root->left, arr, top + 1, rslt, fd);
     }
 
     // Assign 1 to right edge and recur
     if (root->right) {
 
         arr[top] = 1;
-        printCodes(root->right, arr, top + 1, rslt);
+        printCodes(root->right, arr, top + 1, rslt, fd);
     }
 
-    // If this is a leaf node, then
-    // it contains one of the input
-    // characters, print the character
-    // and its code from arr[]
-    if (isLeaf(root)) {
+    /**
+		 	* If this is a leaf node, then it contains one of the
+			* input characters, print the character and its code from arr[]
+			*/
+		if (isLeaf(root)) {
+			//printf("%s\n", printArr(arr, top));
 
-        printf("%s\t\t", root->str);
-        printArr(arr, top);
+			rslt = concat(rslt, tabConcat(root->str, "\t") );
+			// rslt = concat(rslt, "\n");
+
+			if(write(fd, rslt, strlen(rslt)+1 ) != strlen(rslt)+1){
+				char * err = "There was an error writing to\n";
+				printf("%s\n", concat(err, root->str));
+			}
+			printArr(arr, top, fd);
+			//tabConcat(root->str, );
+			//free(temp);
+			free(rslt);
+			return 0;
+      // printf("%s\t\t", root->str);
+      // printArr(arr, top);
     }
 }
 
@@ -769,15 +802,16 @@ char *printCodes(treeNode* root, int arr[], int top, char *rslt){
 	* @param fileNames an array of all of the file names in the dir
 	* @return NULL
 	*/
-char *HuffmanCodes(unsigned size){
+void HuffmanCodes(unsigned size, int fd){
     // Construct Huffman Tree
     treeNode* root = buildHuffmanTree(mhArray, size);
 
     // Print Huffman codes using the Huffman tree built above
-    int arr[MAX_TREE_HT], top = 0;
-		char *rslt;
+    char arr[MAX_TREE_HT];
+		int top = 0;
+		char *rslt = "";
 
-    return printCodes(root, arr, top, rslt);
+    printCodes(root, arr, top, rslt, fd);
 }
 
 /************************************************/
@@ -818,7 +852,8 @@ char* tabConcat(const char *s1, const char *s2){
 	* @return str the resulting string. (MUST BE FREED)
 	*/
 char* parseInt(const int num){
-	char *str = malloc(getLen(num) * sizeof(char));
+	// printf("%d\n", getLen(num));
+	char *str = malloc(20);
 	sprintf(str, "%d", num);
 	return str;
 
