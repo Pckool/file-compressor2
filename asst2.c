@@ -44,10 +44,11 @@ fileList * addToFileList(fileList * fl, fileList * newLink){
 }
 
 treeNode * createNode(char * newStr){
+
 	treeNode * temp = (treeNode*)malloc(sizeof(treeNode));
+	printf("on ste yee\n");
 	temp->left = NULL;
 	temp->right = NULL;
-	temp->parent = NULL;
 	temp->files = NULL;
 	temp->str = strdup(newStr);
 	return temp;
@@ -551,14 +552,21 @@ treeNode *getLeaf(treeNode *head){
 // A utility function allocate a new
 // min heap node with given string
 // and frequency of the string
-struct treeNode* newNode(char *data, unsigned freq){
-    struct treeNode* temp = createNode(data);
-		fileList *fls = malloc(sizeof(fileList));
-		fls->fileName = NULL;
-		fls->counter = freq;
-		fls->next = NULL;
-		temp->files = fls;
-    return temp;
+treeNode* newNode(char *data, unsigned freq){
+	treeNode * temp = (treeNode*)malloc(sizeof(treeNode));
+	printf("on ste yee\n");
+	temp->left = NULL;
+	temp->right = NULL;
+	temp->files = NULL;
+	temp->str = strdup(data);
+	return temp;
+	printf("about to make the files thing\n");
+	fileList *fls = malloc(sizeof(fileList));
+	fls->fileName = NULL;
+	fls->counter = freq;
+	fls->next = NULL;
+	temp->files = fls;
+  return temp;
 }
 
 // A utility function to create
@@ -570,9 +578,11 @@ MinHeap* createMinHeap(unsigned capacity){
     // current size is 0
     minHeap->size = 0;
 
-    minHeap->capacity = capacity;
-
-    minHeap->array = (treeNode**)malloc(minHeap->capacity * sizeof(treeNode*));
+    minHeap->capacity = iCounter;
+		printf("Capacity: %i\n", capacity);
+		printf("icounter: %i\n", iCounter);
+    // minHeap->array = (treeNode**)malloc(3 * sizeof(treeNode*));
+		minHeap->array = NULL;
     return minHeap;
 }
 
@@ -585,7 +595,7 @@ void swapMinHeapNode(treeNode** a, treeNode** b){
     *b = t;
 }
 // The standard minHeapify function.
-void minHeapify(struct MinHeap* minHeap,unsigned size, int idx){
+void minHeapify(MinHeap* minHeap,unsigned size, int idx){
 
     int smallest = idx;
     int left = 2 * idx + 1;
@@ -643,8 +653,9 @@ void buildMinHeap(MinHeap* minHeap){
     int n = minHeap->size - 1;
     int i;
 
-    for (i = (n - 1) / 2; i >= 0; --i)
-        minHeapify(minHeap, minHeap->size, i);
+    for (i = (n - 1) / 2; i >= 0; --i){
+      minHeapify(minHeap, minHeap->size, i);
+		}
 }
 
 // A utility function to print an array of size n
@@ -675,6 +686,7 @@ MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
     //     minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
 
     minHeap->size = size;
+		printf("building minheap...\n");
     buildMinHeap(minHeap);
 
     return minHeap;
@@ -704,12 +716,13 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
         // left and right children of this new node.
         // Add this node to the min heap
         // '$' is a special value for internal nodes, not used
+				printf("on step 3\n");
         top = newNode("$", left->files->counter + right->files->counter);
 
         top->left = left;
         top->right = right;
-
-        insertMinHeap(minHeap, top);
+			printf("inserting minheap\n");
+      insertMinHeap(minHeap, top);
     }
 
     // Step 4: The remaining node is the

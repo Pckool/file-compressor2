@@ -12,7 +12,7 @@
 #include <errno.h>
 
 typedef struct treeNode{
-	struct treeNode *left, *right, *parent;
+	struct treeNode *left, *right;
  	struct fileList *files;
  	char *str;
 }treeNode;
@@ -54,7 +54,7 @@ unsigned countPaths();
 treeNode **toArray(treeNode *head, unsigned size);
 treeNode *getLeaf(treeNode *head);
 
-struct treeNode* newNode(char *data, unsigned freq);
+treeNode* newNode(char *data, unsigned freq);
 void HuffmanCodes(unsigned size);
 MinHeap* createMinHeap(unsigned capacity);
 void swapMinHeapNode(treeNode** a, treeNode** b);
