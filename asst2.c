@@ -1,5 +1,9 @@
 #include "asst2.h"
 
+static masterFileList *paths = NULL;
+static treeNode **mhArray = NULL;
+static unsigned iCounter = 0;
+
 int main(int argc, char * argv[]){
 	if(argc != 3){
 		fprintf(stderr, "Error, incorrect number of arguments.\n");
@@ -43,6 +47,7 @@ treeNode * createNode(char * newStr){
 	treeNode * temp = (treeNode*)malloc(sizeof(treeNode));
 	temp->left = NULL;
 	temp->right = NULL;
+	temp->parent = NULL;
 	temp->files = NULL;
 	temp->str = strdup(newStr);
 	return temp;
@@ -208,8 +213,11 @@ void writeBook(treeNode * head, int fd){
 		fprintf(stderr, "empty or access to the files wasn't grated.\n");
 		return;
 	}
+	unsigned numWords = getLeafCount(head);
 
-	sorter(ptr);
+	// sorter(ptr);
+	toArray(head, numWords);
+	HuffmanCodes(numWords);
 
 	if(head->left != NULL){
 		writeBook(head->left, fd);
@@ -328,49 +336,59 @@ void sorter(fileList * fl){
 }
 
 //Iterates through a directory opening up the files
-treeNode * fileIterator(char * name, treeNode * head){
+treeNode * fileIterator(char * dirName, treeNode * head){
 	DIR * dir;
 	struct dirent * entry;
 	char * fileContents;
 	errno = 0;
 	int errsv;
-	if((dir = opendir(name)) == NULL){
+	if((dir = opendir(dirName)) == NULL){
 		errsv = errno;
 		if(errsv == 2){
-			fprintf(stderr, "\nNo such file, directory, or improperly formed path: \"%s\".\n", name);
+			fprintf(stderr, "\nNo such file, directory, or improperly formed path: \"%s\".\n", dirName);
 			return head;
 		}
 		if(errsv == 20){
-			fileContents = extract(name);
+			fileContents = extract(dirName);
 			if(fileContents == NULL){
 				return head;
 			}
-			head = tokenize(fileContents, head, name);
+			head = tokenize(fileContents, head, dirName);
 			free(fileContents);
 			return head;
 		}
 		return NULL;
 	}
 	while((entry = readdir(dir))){
+		// if it is a directory
 		if(entry->d_type == DT_DIR){
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
 			    continue;
 			}
 			else{
-				char * path = mkPath(name, entry->d_name);
+				// paths = addPath(entry->d_name, paths);
+				// printPaths(paths);
+				// char * path = mkPath(dirName, entry->d_name);
+				char *temp = concat(entry->d_name, "/");
+				char * path = concat(dirName, temp);
+				free(temp);
 				head = fileIterator(path, head);
 				free(path);
 			}
 		}
+		// if it is a normal file
 		else if(entry->d_type == DT_REG){
-			char * path = mkPath(name, entry->d_name);
+			paths = addPath(dirName, entry->d_name, paths);
+			printPaths();
+			char * path = mkPath(dirName, entry->d_name);
 			fileContents = extract(path);
 			head = tokenize(fileContents, head, entry->d_name);
 			free(fileContents);
 			free(path);
 		}
+		// if it is anything else
 		else{
-			char * path = mkPath(name, entry->d_name);
+			char * path = mkPath(dirName, entry->d_name);
 			fprintf(stderr, "I don't know how to handle this entry. %s\n", path);
 			free(path);
 		}
@@ -412,8 +430,340 @@ void swap(fileList * link1, fileList * link2){
 	link2->counter = tempCounter;
 }
 
-// Helping functions
+/**
+ 	* Find all of the files in the directory, pair up their paths, then put that in a chain. An easy way to keep track of the files found.
+	*/
+masterFileList *addPath(const char *path, const char *name, masterFileList *pathsHere){
+	// the initial path add
+	if(pathsHere == NULL){
+		pathsHere = malloc(sizeof(masterFileList));
+		pathsHere->fileName = (char*)malloc((strlen(name)+1) * sizeof(char));
+		pathsHere->path = (char*)malloc((strlen(path)+1) * sizeof(char));
+		pathsHere->next = NULL;
+		strcpy(pathsHere->path, path);
+		strcpy(pathsHere->fileName, name);
+		printf("created paths and added %s\n", pathsHere->fileName);
+		// printPaths(paths);
+		 return pathsHere;
+	}
+	else{
+		if(pathsHere->next != NULL){
+			addPath(path, name, pathsHere->next);
+			 return pathsHere;
+		}
+		else if(pathsHere->next == NULL){
+			masterFileList *tempPath = malloc(sizeof(masterFileList));
+			tempPath->fileName = (char*)malloc((strlen(name)+1) * sizeof(char));
+			tempPath->path = (char*)malloc((strlen(path)+1) * sizeof(char));
+			tempPath->next = NULL;
+			strcpy(tempPath->path, path);
+			strcpy(tempPath->fileName, name);
 
+			pathsHere->next = tempPath;
+			printf("%s added to paths\n", pathsHere->next->fileName);
+
+			 return pathsHere;
+		}
+
+	}
+
+}
+
+void printPaths(){
+	masterFileList *temp = paths;
+	int go = 1;
+	printf("paths:");
+	if(paths != NULL){
+		while(go){
+			printf(" %s", temp->fileName);
+			if(temp->next != NULL){
+				temp = temp->next;
+				printf(",");
+			}
+			else{
+				printf("\n");
+				go = 0;
+			}
+		}
+	}
+}
+
+unsigned countPaths(){
+	masterFileList *temp = paths;
+	int go = 1;
+	unsigned count = 0;
+	while(go){
+		++count;
+		if(temp->next != NULL){
+			temp = temp->next;
+		}
+		else{
+			go = 0;
+		}
+	}
+	return count;
+}
+
+treeNode **toArray(treeNode *head, unsigned size){
+	mhArray = (treeNode**)malloc(size * sizeof(treeNode*));
+	getLeaf(head);
+
+}
+
+treeNode *getLeaf(treeNode *head){
+	treeNode *temp;
+	if(head != NULL && head->left != NULL){
+		temp = getLeaf(head->left);
+		head->left = NULL;
+		getLeaf(head);
+		// ++iCounter;
+
+		return temp;
+	}
+	else if(head != NULL && head->left == NULL){
+
+	}
+	if(head != NULL && head->right != NULL){
+		temp = getLeaf(head->right);
+		head->right = NULL;
+		getLeaf(head);
+		// ++iCounter;
+		return temp;
+	}
+	else if(head != NULL && head->right == NULL){
+
+	}
+	if(head != NULL && head->left == NULL && head->right == NULL){
+		mhArray[iCounter] = head;
+		++iCounter;
+		return head;
+	}
+}
+
+
+/************************************************/
+// HUFFMAN CODE
+/************************************************/
+
+
+#define MAX_TREE_HT 1000
+
+// A utility function allocate a new
+// min heap node with given string
+// and frequency of the string
+struct treeNode* newNode(char *data, unsigned freq){
+    struct treeNode* temp = createNode(data);
+		fileList *fls = malloc(sizeof(fileList));
+		fls->fileName = NULL;
+		fls->counter = freq;
+		fls->next = NULL;
+		temp->files = fls;
+    return temp;
+}
+
+// A utility function to create
+// a min heap of given capacity
+MinHeap* createMinHeap(unsigned capacity){
+
+    MinHeap* minHeap = (MinHeap*)malloc(sizeof(MinHeap));
+
+    // current size is 0
+    minHeap->size = 0;
+
+    minHeap->capacity = capacity;
+
+    minHeap->array = (treeNode**)malloc(minHeap->capacity * sizeof(treeNode*));
+    return minHeap;
+}
+
+// A utility function to
+// swap two min heap nodes
+void swapMinHeapNode(treeNode** a, treeNode** b){
+
+    treeNode* t = *a;
+    *a = *b;
+    *b = t;
+}
+// The standard minHeapify function.
+void minHeapify(struct MinHeap* minHeap,unsigned size, int idx){
+
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
+
+    if (left < size && minHeap->array[left]->files-> counter < minHeap->array[smallest]->files->counter)
+        smallest = left;
+
+    if (right < size && minHeap->array[right]->files-> counter < minHeap->array[smallest]->files->counter)
+        smallest = right;
+
+    if (smallest != idx) {
+        swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
+        minHeapify(minHeap, size, smallest);
+    }
+}
+
+// A utility function to check
+// if size of heap is 1 or not
+int isSizeOne(MinHeap* minHeap){
+    return (minHeap->size == 1);
+}
+
+// A standard function to extract
+// minimum value node from heap
+treeNode* extractMin(MinHeap* minHeap){
+
+    treeNode* temp = minHeap->array[0];
+    minHeap->array[0] = minHeap->array[minHeap->size - 1];
+    --minHeap->size;
+    minHeapify(minHeap, minHeap->size, 0);
+
+    return temp;
+}
+
+// A utility function to insert
+// a new node to Min Heap
+void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode){
+
+    ++minHeap->size;
+    int i = minHeap->size - 1;
+
+    while (i && minHeapNode->files->counter < minHeap->array[(i - 1) / 2]->files->counter) {
+
+        minHeap->array[i] = minHeap->array[(i - 1) / 2];
+        i = (i - 1) / 2;
+    }
+
+    minHeap->array[i] = minHeapNode;
+}
+
+// A standard funvtion to build min heap
+void buildMinHeap(MinHeap* minHeap){
+
+    int n = minHeap->size - 1;
+    int i;
+
+    for (i = (n - 1) / 2; i >= 0; --i)
+        minHeapify(minHeap, minHeap->size, i);
+}
+
+// A utility function to print an array of size n
+void printArr(int arr[], int n){
+    int i;
+    for (i = 0; i < n; ++i)
+        printf("%d", arr[i]);
+
+    printf("\n");
+}
+
+// Utility function to check if this node is leaf
+int isLeaf(treeNode* root){
+
+    return !(root->left) && !(root->right);
+}
+
+// Creates a min heap of capacity
+// equal to size and inserts all character of
+// data[] in min heap. Initially size of
+// min heap is equal to capacity
+MinHeap* createAndBuildMinHeap(treeNode **arr, int size){
+
+    MinHeap* minHeap = createMinHeap(size);
+
+    for (int i = 0; i < size; ++i)
+        minHeap->array[i] = arr[i]; // newNode(arr[i], arr[i]->files->counter);
+
+    minHeap->size = size;
+    buildMinHeap(minHeap);
+
+    return minHeap;
+}
+
+// The main function that builds Huffman tree
+treeNode* buildHuffmanTree(treeNode **arr, int size){
+    treeNode *left, *right, *top;
+
+    // Step 1: Create a min heap of capacity
+    // equal to size.  Initially, there are
+    // modes equal to size.
+    MinHeap* minHeap = createAndBuildMinHeap(arr, size);
+
+    // Iterate while size of heap doesn't become 1
+    while (!isSizeOne(minHeap)) {
+
+        // Step 2: Extract the two minimum
+        // freq items from min heap
+        left = extractMin(minHeap);
+        right = extractMin(minHeap);
+
+        // Step 3:  Create a new internal
+        // node with frequency equal to the
+        // sum of the two nodes frequencies.
+        // Make the two extracted node as
+        // left and right children of this new node.
+        // Add this node to the min heap
+        // '$' is a special value for internal nodes, not used
+        top = newNode("$", left->files->counter + right->files->counter);
+
+        top->left = left;
+        top->right = right;
+
+        insertMinHeap(minHeap, top);
+    }
+
+    // Step 4: The remaining node is the
+    // root node and the tree is complete.
+    return extractMin(minHeap);
+}
+
+// Prints huffman codes from the root of Huffman Tree.
+// It uses arr[] to store codes
+void printCodes(treeNode* root, int arr[], int top){
+
+    // Assign 0 to left edge and recur
+    if (root->left) {
+
+        arr[top] = 0;
+        printCodes(root->left, arr, top + 1);
+    }
+
+    // Assign 1 to right edge and recur
+    if (root->right) {
+
+        arr[top] = 1;
+        printCodes(root->right, arr, top + 1);
+    }
+
+    // If this is a leaf node, then
+    // it contains one of the input
+    // characters, print the character
+    // and its code from arr[]
+    if (isLeaf(root)) {
+
+        printf("%s: ", root->str);
+        printArr(arr, top);
+    }
+}
+
+/**
+ 	* The main function that builds a Huffman Tree and print codes by traversing the built Huffman Tree
+	* @param head the head of the tree
+	* @param fileNames an array of all of the file names in the dir
+	* @return NULL
+	*/
+void HuffmanCodes(unsigned size){
+    // Construct Huffman Tree
+    treeNode* root = buildHuffmanTree(mhArray, size);
+
+    // Print Huffman codes using the Huffman tree built above
+    int arr[MAX_TREE_HT], top = 0;
+
+    printCodes(root, arr, top);
+}
+
+/************************************************/
+// Helping functions
+/************************************************/
 
 /**
 	* a function to concatenate strings
@@ -442,3 +792,33 @@ char* tabConcat(const char *s1, const char *s2){
 	free(temp);
   return result;
 }
+
+/**
+	* Take in an int and convert it to a string
+	* @param num the int to parse
+	* @return str the resulting string. (MUST BE FREED)
+	*/
+char* parseInt(const int num){
+	char *str = malloc(getLen(num) * sizeof(char));
+	sprintf(str, "%d", num);
+	return str;
+
+}
+
+/*
+	* Function to get the count of full Nodes in a binary tree
+	* @param node the head node of the tree
+	* @return count number of nodes in the tree
+	*/
+unsigned int getLeafCount(treeNode* node){
+	if(node == NULL)
+		return 0;
+	if(node->left == NULL && node->right==NULL)
+		return 1;
+	else
+		return getLeafCount(node->left) + getLeafCount(node->right);
+}
+
+// char** addStringToArray(const char ** strArr, char * str){
+//
+// }

@@ -12,18 +12,28 @@
 #include <errno.h>
 
 typedef struct treeNode{
-	struct treeNode * left;
- 	struct treeNode * right;
- 	struct fileList * files;
- 	char * str;
+	struct treeNode *left, *right, *parent;
+ 	struct fileList *files;
+ 	char *str;
 }treeNode;
 
- typedef struct fileList{
- 	int counter;
- 	char * fileName;
- 	struct fileList * next;
- }fileList;
+typedef struct fileList{
+	int counter;
+	char * fileName;
+	struct fileList * next;
+}fileList;
 
+typedef struct masterFileList{
+	char * fileName;
+	char *path;
+	struct masterFileList * next;
+}masterFileList;
+
+typedef struct MinHeap {
+	unsigned size;
+  unsigned capacity;
+  struct treeNode** array;
+}MinHeap;
 
 void lDestroy(fileList * fl);
 void tDestroy(treeNode * head);
@@ -36,9 +46,32 @@ void sorter(fileList * fl);
 int getLen(int x);
 char * extract(char * path);
 char * mkPath(char * currentPath, char * nextDir);
-treeNode * fileIterator(char * name, treeNode * head);
+treeNode * fileIterator(char * dirName, treeNode * head);
 treeNode * tokenize(char * fileContents, treeNode * head, char * currentFile);
+masterFileList *addPath(const char *path, const char *name, masterFileList *paths);
+void printPaths();
+unsigned countPaths();
+treeNode **toArray(treeNode *head, unsigned size);
+treeNode *getLeaf(treeNode *head);
+
+struct treeNode* newNode(char *data, unsigned freq);
+void HuffmanCodes(unsigned size);
+MinHeap* createMinHeap(unsigned capacity);
+void swapMinHeapNode(treeNode** a, treeNode** b);
+void minHeapify(struct MinHeap* minHeap,unsigned size, int idx);
+int isSizeOne(MinHeap* minHeap);
+treeNode* extractMin(MinHeap* minHeap);
+void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode);
+void buildMinHeap(MinHeap* minHeap);
+void printArr(int arr[], int n);
+int isLeaf(treeNode* root);
+MinHeap* createAndBuildMinHeap(treeNode **arr, int size);
+treeNode* buildHuffmanTree(treeNode **arr, int size);
+void printCodes(treeNode* root, int arr[], int top);
+
 
 char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);
+char* parseInt(const int num);
+unsigned int getLeafCount(treeNode* node);
 #endif
