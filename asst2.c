@@ -505,7 +505,6 @@ unsigned countPaths(){
 }
 
 treeNode **toArray(treeNode *head, unsigned size){
-	printf("yoink: %i\n", size);
 	mhArray = (treeNode**)malloc(size * sizeof(treeNode*));
 	free(head);
 	getLeaf(head);
@@ -536,6 +535,7 @@ treeNode *getLeaf(treeNode *head){
 
 	}
 	if(head != NULL && head->left == NULL && head->right == NULL){
+		printf("adding string \"%s\" to position %i in the array\n", head->str, iCounter);
 		mhArray[iCounter] = head;
 		++iCounter;
 		return head;
@@ -560,9 +560,8 @@ treeNode* newNode(char *data, unsigned freq){
 	temp->right = NULL;
 	temp->files = NULL;
 	temp->str = strdup(data);
-	return temp;
 	printf("about to make the files thing\n");
-	fileList *fls;
+	fileList *fls = (fileList*)malloc(sizeof(fileList));
 	fls->fileName = NULL;
 	fls->counter = freq;
 	fls->next = NULL;
@@ -640,7 +639,7 @@ void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode){
     int i = minHeap->size - 1;
 
     while (i && minHeapNode->files->counter < minHeap->array[(i - 1) / 2]->files->counter) {
-
+				printf("YIKES\n");
         minHeap->array[i] = minHeap->array[(i - 1) / 2];
         i = (i - 1) / 2;
     }
@@ -700,7 +699,7 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
     // Step 1: Create a min heap of capacity
     // equal to size.  Initially, there are
     // modes equal to size.
-    MinHeap* minHeap = createAndBuildMinHeap(arr, size);
+    MinHeap* minHeap = createAndBuildMinHeap(mhArray, size);
 
     // Iterate while size of heap doesn't become 1
     while (!isSizeOne(minHeap)) {
@@ -825,13 +824,22 @@ char* parseInt(const int num){
 	* @param node the head node of the tree
 	* @return count number of nodes in the tree
 	*/
-unsigned int getLeafCount(treeNode* node){
-	if(node == NULL)
-		return 0;
-	if(node->left == NULL && node->right==NULL)
-		return 1;
-	else
-		return getLeafCount(node->left) + getLeafCount(node->right);
+unsigned int getLeafCount(treeNode* head){
+	// if(head == NULL)
+	// 	return 0;
+	// if(head->left == NULL && head->right==NULL)
+	// 	return 1;
+	// else
+	// 	return getLeafCount(head->left) + getLeafCount(head->right);
+	int c =  1;
+    if (head ==NULL)
+        return 0;
+    else
+    {
+        c += getLeafCount(head->left);
+        c += getLeafCount(head->right);
+        return c;
+    }
 }
 
 // char** addStringToArray(const char ** strArr, char * str){
