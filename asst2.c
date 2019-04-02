@@ -24,7 +24,8 @@ int main(int argc, char * argv[]){
 		//decompress stuff goes here
 	}
 	if(argv[1][0] == '-' && argv[1][1] == 'c'){
-		//Compress stuff here
+		char* dir = argv[2];
+		compressFiles(dir);
 	}
 	return 0;
 }
