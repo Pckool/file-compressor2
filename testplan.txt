@@ -3,3 +3,6 @@ Locked: Tried putting in a file that it didn't have read access to and this was 
 Directory:Passed a directory with multiple files and this was handled with.
 Directory with sub directory: Was passed a directory that contained sub directories. This was also handled with. It was able to traverse down the subdirectories and go back up and open and read all the files. 
 Long Files: Was passed the entierty of Hamlet twice and was able to tokenize it all and compress it in a reasonable amount of time. 
+
+
+We didn't track speed in this assignment like we did in assignment 1, but like I mentioned breifly in the README, the implementation in our code that we are submitting is the fastest we had. At one point it took our code about 30-45 seconds to parse and tokenize the entirity of Hamlet once. Now it can do it twice in much faster time. Our testplan here was to just outline some of the conditions we put our code through. We tried long and short files. Empty files and files that we are locked out of reading. We tried directories and sub directories and eveything we threw at it it the program was able to handle, whoich leads us to beleive that our code was built and implemented correctly.
