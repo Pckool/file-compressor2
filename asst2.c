@@ -10,18 +10,18 @@ int main(int argc, char * argv[]){
 		return -1;
 	}
 	if(argc > 5){
-		fprintf(stderror, "Error. Too many arguments.\n");
+		fprintf(stderr, "Error. Too many arguments.\n");
 		return -1;
 	}
-	if((argv[1][0] == "-" && argv[1][1] == "b" && argv[2][0] == "-" && argv[2][1] == "R") || (argv[1][0] == "-" && argv[1][1] == "R" && argv[2][0] == "-" && argv[2][1] == "b")){
+	if((argv[1][0] == '-' && argv[1][1] == 'b' && argv[2][0] == '-' && argv[2][1] == 'R') || (argv[1][0] == '-' && argv[1][1] == 'R' && argv[2][0] == '-' && argv[2][1] == 'b')){
 		treeNode * head = NULL;
 		head = fileIterator(argv[3], head);
 		tDestroy(head);
 	}
-	if(argv[1][0] == "-" && argv[1][1] == "d"){
+	if(argv[1][0] == '-' && argv[1][1] == 'd'){
 		//decompress stuff goes here
 	}
-	if(argv[1][0] == "-" && argv[1][1] == "c"){
+	if(argv[1][0] == '-' && argv[1][1] == 'c'){
 		//Compress stuff here
 	}
 	return 0;
@@ -230,13 +230,9 @@ void writeBook(treeNode * head, int fd){
 	HuffmanCodes(numWords, fd);
 }
 
-<<<<<<< HEAD
 /**
 	* Pulls all the data out of a given file designated by path
 	*/
-=======
-//Pulls all the data out of a given file designated by path
->>>>>>> b1c4be88f3d26fd6d11ddc5738f38935fe57b80c
 char * extract(char * path){
 	errno = 0;
 	int fd = open(path, O_RDONLY);
@@ -785,7 +781,7 @@ void HuffmanCodes(unsigned size, int fd){
 /************************************************/
 // Compress functions
 /************************************************/
-void compressFiles(masterFileList *files, wordsList *words){
+void compressFiles(char *dirName, masterFileList *files, wordsList *words){
 	// files->fileName
 	DIR * dir;
 	struct dirent * entry;
@@ -842,9 +838,9 @@ void compressFiles(masterFileList *files, wordsList *words){
 	closedir(dir);
 	return words;
 
-	if(files->next != NULL){
-		compressFiles(files->next);
-	}
+	// if(files->next != NULL){
+	// 	compressFiles(files->next);
+	// }
 }
 
 /**
@@ -862,8 +858,7 @@ treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
 	int  len = 0;
 	int  i = 0;
 	len = strlen(inputString);
-	treeNode * tempNode;
-	fileList * tempLink;
+	wordsList * tempLink;
 	for(i = 0; i <= len; i++){
 		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
 			if(sizeOfString == 0){
@@ -872,9 +867,8 @@ treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
 			else{
 				endingPos = i;
 				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
-				tempNode = createNode(tempString);
-				tempLink = createLinkNode(currentFile);
-				words = addToTree(words, tempNode, tempLink);
+				tempLink = createWordLink(tempString);
+				words = addToChain(words, tempLink);
 				free(tempString);
 				startingPos = -1;
 				sizeOfString = 0;
@@ -890,7 +884,34 @@ treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
 			}
 		}
 	}
-	return head;
+	printChain(words);
+	return words;
+}
+
+wordsList * createWordLink(char * newStr){
+
+	wordsList * temp = (treeNode*)malloc(sizeof(treeNode));
+	temp->next = NULL;
+	temp->word = strdup(newStr);
+	return temp;
+}
+
+wordsList *addToChain(wordsList *words, wordsList *newLink){
+	if(words->next == NULL){
+		words->next = newLink;
+		return words;
+	}
+	else
+		addToChain(words->next, newLink);
+		return words;
+}
+
+void printChain(wordsList *words){
+	if(words != NULL){
+		printf("%s\n", words->word);
+		if(words->next != NULL)
+			printChain(words->next);
+	}
 }
 
 /************************************************/
@@ -968,4 +989,13 @@ char *charAppend(char str[], char charr){
 	newStr[strlen(str)] = charr;
 	newStr[strlen(str)+1] = '\0';
 	return newStr;
+}
+
+/**
+	* get the file extension
+	*/
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }

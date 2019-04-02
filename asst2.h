@@ -63,7 +63,7 @@ treeNode* newNode(char *data, unsigned freq);
 void HuffmanCodes(unsigned size, int fd);
 MinHeap* createMinHeap(unsigned capacity);
 void swapMinHeapNode(treeNode** a, treeNode** b);
-void minHeapify(struct MinHeap* minHeap,unsigned size, int idx);
+void minHeapify(MinHeap* minHeap,unsigned size, int idx);
 int isSizeOne(MinHeap* minHeap);
 treeNode* extractMin(MinHeap* minHeap);
 void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode);
@@ -74,6 +74,11 @@ MinHeap* createAndBuildMinHeap(treeNode **arr, int size);
 treeNode* buildHuffmanTree(treeNode **arr, int size);
 int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd);
 
+void compressFiles(char *dirName, masterFileList *files, wordsList *words);
+treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile);
+wordsList * createWordLink(char * newStr);
+wordsList *addToChain(wordsList *words, wordsList *newLink);
+void printChain(wordsList *words);
 
 char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);
