@@ -16,6 +16,8 @@ int main(int argc, char * argv[]){
 	if((argv[1][0] == '-' && argv[1][1] == 'b' && argv[2][0] == '-' && argv[2][1] == 'R') || (argv[1][0] == '-' && argv[1][1] == 'R' && argv[2][0] == '-' && argv[2][1] == 'b')){
 		treeNode * head = NULL;
 		head = fileIterator(argv[3], head);
+		char *outputf = concat(argv[3], "/codebook");
+		finalOutput(head, outputf);
 		tDestroy(head);
 	}
 	if(argv[1][0] == '-' && argv[1][1] == 'd'){
@@ -781,7 +783,11 @@ void HuffmanCodes(unsigned size, int fd){
 /************************************************/
 // Compress functions
 /************************************************/
-void compressFiles(char *dirName, masterFileList *files, wordsList *words){
+
+wordsList *compressFiles(char *dirName){
+
+}
+wordsList *scrubFiles(char *dirName, wordsList *words){
 	// files->fileName
 	DIR * dir;
 	struct dirent * entry;
@@ -815,7 +821,7 @@ void compressFiles(char *dirName, masterFileList *files, wordsList *words){
 				char *temp = concat(entry->d_name, "/");
 				char * path = concat(dirName, temp);
 				free(temp);
-				words = fileIterator(path, words);
+				words = scrubFiles(path, words);
 				free(path);
 			}
 		}
@@ -846,7 +852,7 @@ void compressFiles(char *dirName, masterFileList *files, wordsList *words){
 /**
 	* Tokenizes the words that are passed to it.
 	*/
-treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
+wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile){
 	if(fileContents == NULL){
 		return words;
 	}
@@ -890,7 +896,7 @@ treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
 
 wordsList * createWordLink(char * newStr){
 
-	wordsList * temp = (treeNode*)malloc(sizeof(treeNode));
+	wordsList * temp = (wordsList*)malloc(sizeof(wordsList));
 	temp->next = NULL;
 	temp->word = strdup(newStr);
 	return temp;
