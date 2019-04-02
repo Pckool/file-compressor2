@@ -40,6 +40,12 @@ typedef struct wordsList{
 	struct wordsList *next;
 }wordsList;
 
+typedef struct bitDict{
+	char *token;
+	char *bits;
+	struct bitDict *next;
+}bitDict;
+
 void lDestroy(fileList * fl);
 void tDestroy(treeNode * head);
 void finalOutput(treeNode * head, char * outputFileName);
@@ -79,6 +85,11 @@ wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile)
 wordsList * createWordLink(char * newStr);
 wordsList *addToChain(wordsList *words, wordsList *newLink);
 void printChain(wordsList *words);
+void findCodebook(wordsList * words, char * outputFileName, char *codebookDir, char *outputDir);
+bitDict *addToDictChain(bitDict *dict, bitDict *newLink);
+bitDict * createDictLink(char * newStr, char *bits);
+bitDict * tokenizeCodebook(char * fileContents, bitDict *dict);
+
 
 char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);

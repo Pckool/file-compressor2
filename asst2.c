@@ -630,7 +630,6 @@ void insertMinHeap(MinHeap* minHeap, treeNode* minHeapNode){
     int i = minHeap->size - 1;
 
     while (i && minHeapNode->files->counter < minHeap->array[(i - 1) / 2]->files->counter) {
-				printf("YIKES\n");
         minHeap->array[i] = minHeap->array[(i - 1) / 2];
         i = (i - 1) / 2;
     }
@@ -647,7 +646,6 @@ void buildMinHeap(MinHeap* minHeap){
     int i;
 
     for (i = (n - 1) / 2; i >= 0; --i){
-			printf("minheapifying... with %i\n", n);
       minHeapify(minHeap, minHeap->size, i);
 		}
 }
@@ -744,17 +742,18 @@ int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd){
 			*/
 		if (isLeaf(root)) {
 			//printf("%s\n", printArr(arr, top));
-
-			rslt = concat(rslt, tabConcat(root->str, "\t") );
 			char *code = printArr(arr, top, fd);
+			rslt = concat(rslt, tabConcat(code, "\t") );
 
-			rslt = concat(rslt, code);
+
+			rslt = concat(rslt, root->str);
 
 			rslt = concat(rslt, "\n\0");
-			printf("%s\n", rslt);
+			// printf("%s\n", rslt);
 			if(write(fd, rslt, strlen(rslt) ) != strlen(rslt)){
-				char * err = "There was an error writing to\n";
+				char * err = "There was an error writing to";
 				printf("%s\n", concat(err, root->str));
+				return 1;
 			}
 			free(rslt);
 			return 0;
@@ -776,7 +775,9 @@ void HuffmanCodes(unsigned size, int fd){
 		int top = 0;
 		char *rslt = "";
 
-    printCodes(root, arr, top, rslt, fd);
+    if(printCodes(root, arr, top, rslt, fd) == 1){
+
+		};
 }
 
 
@@ -894,6 +895,49 @@ wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile)
 	return words;
 }
 
+bitDict * tokenizeCodebook(char * fileContents, bitDict *dict){
+	if(fileContents == NULL){
+		return dict;
+	}
+	char * inputString = fileContents;
+	char * tempString;
+	int startingPos = -1;
+	int endingPos = 0;
+	int sizeOfString = 0;
+	int  len = 0;
+	int  i = 0;
+	len = strlen(inputString);
+	wordsList * tempLink;
+	int side = 0;
+	for(i = 0; i <= len; i++){
+		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+			if(sizeOfString == 0){
+				continue;
+			}
+			else{
+				endingPos = i;
+				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
+				tempLink = createDictLink(tempString, );
+				dict = addToChain(dict, tempLink);
+				free(tempString);
+				startingPos = -1;
+				sizeOfString = 0;
+			}
+		}
+		else{
+			if(startingPos == -1){
+				startingPos = i;
+				sizeOfString++;
+			}
+			else{
+				sizeOfString++;
+			}
+		}
+	}
+	printChain(dict);
+	return dict;
+}
+
 wordsList * createWordLink(char * newStr){
 
 	wordsList * temp = (wordsList*)malloc(sizeof(wordsList));
@@ -918,6 +962,60 @@ void printChain(wordsList *words){
 		if(words->next != NULL)
 			printChain(words->next);
 	}
+}
+
+bitDict * createDictLink(char * newStr, char *bits){
+
+	bitDict * temp = (bitDict*)malloc(sizeof(bitDict));
+	temp->next = NULL;
+	temp->token = strdup(newStr);
+	temp->bits = strdup(bits);
+	return temp;
+}
+
+bitDict *addToDictChain(bitDict *dict, bitDict *newLink){
+	if(dict->next == NULL){
+		dict->next = newLink;
+		return dict;
+	}
+	else
+		addToChain(dict->next, newLink);
+		return dict;
+}
+
+
+void findCodebook(wordsList * words, char * outputFileName, char *codebookDir, char *outputDir){
+	errno = 0;
+	int errsv;
+	int status = 0;
+	int amtToWrite;
+	char line[256];
+	int fd = open(codebookDir, O_RDONLY);
+
+	bitDict *dict = NULL;
+	char *raw_data = extract(codebookDir);
+	dict = tokenizeCodebook(raw_data, dict);
+
+	close(fd);
+	fd = open(outputFileName, O_WRONLY | O_APPEND | O_CREAT, 00700);
+	errsv = errno;
+	if(errsv == 13){
+		fprintf(stderr, "\nYou don't have access to file \"%s\"\n", outputFileName);
+		fprintf(stderr, "No output file can be written.\n");
+		return;
+	}
+	if(fd == -1){
+		fprintf(stderr, "\nError opening file \"%s\" to write our output.\n", outputFileName);
+		return;
+	}
+	if(words == NULL){
+		fprintf(stderr, "\nNo output, empty tree.\n");
+		fprintf(stderr, "There were no files in the directory, the files were ");
+		fprintf(stderr, "empty or access to the files wasn't grated.\n");
+		return;
+	}
+	// printTree(head, fd); //Change this line to writeBook one you are ready to test the programs ability to make codebooks
+	close(fd);
 }
 
 /************************************************/
