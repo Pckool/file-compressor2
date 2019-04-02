@@ -1,0 +1,1 @@
+Empty: Tried putting an empty file through it. It caught this and put out an error
