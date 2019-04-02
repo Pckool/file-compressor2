@@ -5,16 +5,25 @@ static treeNode **mhArray = NULL;
 static unsigned iCounter = 0;
 
 int main(int argc, char * argv[]){
-	if(argc != 3){
-		fprintf(stderr, "Error, incorrect number of arguments.\n");
+	if(argc < 3){
+		fprintf(stderr, "Error. Not enough arguments.\n");
 		return -1;
 	}
-	treeNode * head = NULL;
-	// argv[1] should be the output file
-	// argv[2] should be the input file
-	head = fileIterator(argv[2], head);
-	finalOutput(head, argv[1]);
-	tDestroy(head);
+	if(argc > 5){
+		fprintf(stderror, "Error. Too many arguments.\n");
+		return -1;
+	}
+	if((argv[1][0] == "-" && argv[1][1] == "b" && argv[2][0] == "-" && argv[2][1] == "R") || (argv[1][0] == "-" && argv[1][1] == "R" && argv[2][0] == "-" && argv[2][1] == "b")){
+		treeNode * head = NULL;
+		head = fileIterator(argv[3], head);
+		tDestroy(head);
+	}
+	if(argv[1][0] == "-" && argv[1][1] == "d"){
+		//decompress stuff goes here
+	}
+	if(argv[1][0] == "-" && argv[1][1] == "c"){
+		//Compress stuff here
+	}
 	return 0;
 }
 
@@ -221,9 +230,13 @@ void writeBook(treeNode * head, int fd){
 	HuffmanCodes(numWords, fd);
 }
 
+<<<<<<< HEAD
 /**
 	* Pulls all the data out of a given file designated by path
 	*/
+=======
+//Pulls all the data out of a given file designated by path
+>>>>>>> b1c4be88f3d26fd6d11ddc5738f38935fe57b80c
 char * extract(char * path){
 	errno = 0;
 	int fd = open(path, O_RDONLY);
@@ -347,9 +360,6 @@ treeNode * fileIterator(char * dirName, treeNode * head){
 			    continue;
 			}
 			else{
-				// paths = addPath(entry->d_name, paths);
-				// printPaths(paths);
-				// char * path = mkPath(dirName, entry->d_name);
 				char *temp = concat(entry->d_name, "/");
 				char * path = concat(dirName, temp);
 				free(temp);
@@ -428,7 +438,6 @@ masterFileList *addPath(const char *path, const char *name, masterFileList *path
 		strcpy(pathsHere->path, path);
 		strcpy(pathsHere->fileName, name);
 		printf("created paths and added %s\n", pathsHere->fileName);
-		// printPaths(paths);
 		 return pathsHere;
 	}
 	else{
@@ -952,6 +961,7 @@ unsigned int getLeafCount(treeNode* head){
     }
 }
 
+//Adds char to the string that is being added to the codebook
 char *charAppend(char str[], char charr){
 	char *newStr = malloc(strlen(str)+2);
 	strcpy(newStr, str);
@@ -959,7 +969,3 @@ char *charAppend(char str[], char charr){
 	newStr[strlen(str)+1] = '\0';
 	return newStr;
 }
-
-// char** addStringToArray(const char ** strArr, char * str){
-//
-// }
