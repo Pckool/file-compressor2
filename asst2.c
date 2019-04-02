@@ -786,8 +786,9 @@ void HuffmanCodes(unsigned size, int fd){
 // Compress functions
 /************************************************/
 
-wordsList *compressFiles(char *dirName){
-
+void compressFiles(char *dirName){
+	wordsList *words = NULL;
+	scrubFiles(dirName, words);
 }
 wordsList *scrubFiles(char *dirName, wordsList *words){
 	// files->fileName
@@ -918,7 +919,7 @@ bitDict * tokenizeCodebook(char * fileContents, bitDict *dict){
 			else{
 				endingPos = i;
 				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
-				tempLink = createDictLink(tempString, );
+				tempLink = createDictLink(tempString, "11111");
 				dict = addToChain(dict, tempLink);
 				free(tempString);
 				startingPos = -1;

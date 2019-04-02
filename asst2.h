@@ -80,6 +80,7 @@ MinHeap* createAndBuildMinHeap(treeNode **arr, int size);
 treeNode* buildHuffmanTree(treeNode **arr, int size);
 int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd);
 
+void compressFiles(char *dirName);
 wordsList *scrubFiles(char *dirName, wordsList *words);
 wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile);
 wordsList * createWordLink(char * newStr);
