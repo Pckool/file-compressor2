@@ -124,7 +124,9 @@ char * pullString(int start, int end, int size, char * originalString){
 	return toReturn;
 }
 
-//Tokenizes the words that are passed to it.
+/**
+	* Tokenizes the words that are passed to it.
+	*/
 treeNode * tokenize(char * fileContents, treeNode * head, char * currentFile){
 	if(fileContents == NULL){
 		return head;
@@ -215,40 +217,13 @@ void writeBook(treeNode * head, int fd){
 	}
 	unsigned numWords = getLeafCount(head);
 
-	// sorter(ptr);
 	toArray(head, numWords);
 	HuffmanCodes(numWords, fd);
-
-	// if(head->left != NULL){
-	// 	writeBook(head->left, fd);
-	// }
-	//
-	// // printf("%s\n",head->str);
-	// ptr = head->files;
-	//
-	// while(ptr != NULL){
-	// 	// printf("%s %d\n", ptr->fileName, ptr->counter);
-	//
-	// 	char * line = tabConcat(ptr->fileName, head->str);
-	// 	char * fullLine = concat(line, "\n");
-	// 	// printf("line: %s\tsize: %i\n", line, strlen(line));
-	//
-	// 	if(write(fd, fullLine, strlen(line)+1 ) != strlen(line)+1){
-	// 		char * err = "There was an error writing to\n";
-	// 		printf("%s\n", concat(err, ptr->fileName));
-	// 	}
-	// 	free(line);
-	// 	free(fullLine);
-	// 	ptr = ptr->next;
-	// }
-	//
-	// if(head->right != NULL)
-	// {
-	// 	writeBook(head->right, fd);
-	// }
 }
 
-//Pulls all the data out of a given file designated by path
+/**
+	* Pulls all the data out of a given file designated by path
+	*/
 char * extract(char * path){
 	errno = 0;
 	int fd = open(path, O_RDONLY);
@@ -280,7 +255,9 @@ char * extract(char * path){
 	return fileContents;
 }
 
-//Prints out the unsorted tree
+/**
+	* Prints out the unsorted tree
+	*/
 void printTree(treeNode * head, int fd){
 	fileList * ptr = head->files;
 	if(head == NULL){
@@ -309,7 +286,9 @@ void printTree(treeNode * head, int fd){
 	}
 }
 
-//This function will eventually sort the tree in descending frequency.
+/**
+	* This function will eventually sort the tree in descending frequency.
+	*/
 void sorter(fileList * fl){
 	fileList * currentLink = fl;
 	fileList * iterPtr;
@@ -335,7 +314,9 @@ void sorter(fileList * fl){
 	}
 }
 
-//Iterates through a directory opening up the files
+/**
+	* Iterates through a directory opening up the files
+	*/
 treeNode * fileIterator(char * dirName, treeNode * head){
 	DIR * dir;
 	struct dirent * entry;
@@ -397,7 +378,9 @@ treeNode * fileIterator(char * dirName, treeNode * head){
 	return head;
 }
 
-//makes a pointer to the path that you passed to it
+/**
+	* makes a pointer to the path that you passed to it
+	*/
 char * mkPath(char * currentPath, char * nextDir){
 	int len = strlen(currentPath)+strlen(nextDir)+2;
 	char * path = malloc(len);
@@ -420,7 +403,9 @@ int getLen(int x){
 	return toReturn;
 }
 
-//Swaps the contents of two nodes except there leaves.
+/**
+	* Swaps the contents of two nodes except there leaves.
+	*/
 void swap(fileList * link1, fileList * link2){
 	char * tempFileName = link1->fileName;
 	int tempCounter = link1->counter;
@@ -535,7 +520,6 @@ treeNode *getLeaf(treeNode *head){
 
 	}
 	if(head != NULL && head->left == NULL && head->right == NULL){
-		printf("adding string \"%s\" to position %i in the array\n", head->str, iCounter);
 		mhArray[iCounter] = head;
 		++iCounter;
 		return head;
@@ -578,8 +562,6 @@ MinHeap* createMinHeap(unsigned capacity){
     minHeap->size = 0;
 
     minHeap->capacity = iCounter;
-		printf("Capacity: %i\n", capacity);
-		printf("icounter: %i\n", iCounter);
     // minHeap->array = (treeNode**)malloc(3 * sizeof(treeNode*));
 		minHeap->array = NULL;
     return minHeap;
@@ -598,18 +580,15 @@ void swapMinHeapNode(treeNode** a, treeNode** b){
  	* The standard minHeapify function.
 	*/
 void minHeapify(MinHeap* minHeap,unsigned size, int idx){
-		printf("Minheapify init... \n");
-    int smallest = idx;
+
+		int smallest = idx;
     int left = 2 * idx + 1;
     int right = 2 * idx + 2;
     if (left < size && minHeap->array[left]->files->counter < minHeap->array[smallest]->files->counter)
       smallest = left;
-		printf("Minheapify if2... \n");
     if (right < size && minHeap->array[right]->files->counter < minHeap->array[smallest]->files->counter)
       smallest = right;
-		printf("Minheapify if3... \n");
     if (smallest != idx) {
-			printf("The smallest is not the index; Recursing...\n");
       swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
       minHeapify(minHeap, size, smallest);
     }
@@ -729,28 +708,8 @@ char *printArr(char arr[], int n, int fd){
   int i;
   for (i = 0; i < n; ++i){
 		send = charAppend(send, arr[i]);
-		// printf("%c", arr[i]);
-			// send[i] = temp;
-			// if(send == NULL)
-			//
-			// else
-			//  	concat(send, temp);
-      // printf("%d", arr[i]);
-		}
-		// printf("%s\n", send);
-
-		// if(write(fd, send, sizeof(send) ) != sizeof(send) ){
-		// 	char * err = "There was an error writing to\n";
-		// 	printf("%s\n", err);
-		// }
-		// if(write(fd, "\n", 1 ) != 1 ){
-		// 	char * err = "There was an error writing to\n";
-		// 	printf("%s\n", err);
-		// }
-		//printf("%s\n", send);
-    //send = concat(send, "\n");
-		//printf("%s\n", send);
-		return send;
+	}
+	return send;
 }
 
 /**
@@ -781,22 +740,17 @@ int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd){
 
 			rslt = concat(rslt, tabConcat(root->str, "\t") );
 			char *code = printArr(arr, top, fd);
-			printf("%s\n", code);
+
 			rslt = concat(rslt, code);
 
-			rslt = concat(rslt, "\n");
-
-			if(write(fd, rslt, strlen(rslt)+1 ) != strlen(rslt)+1){
+			rslt = concat(rslt, "\n\0");
+			printf("%s\n", rslt);
+			if(write(fd, rslt, strlen(rslt) ) != strlen(rslt)){
 				char * err = "There was an error writing to\n";
 				printf("%s\n", concat(err, root->str));
 			}
-
-			//tabConcat(root->str, );
-			//free(temp);
 			free(rslt);
 			return 0;
-      // printf("%s\t\t", root->str);
-      // printArr(arr, top);
     }
 }
 
@@ -818,6 +772,118 @@ void HuffmanCodes(unsigned size, int fd){
     printCodes(root, arr, top, rslt, fd);
 }
 
+
+/************************************************/
+// Compress functions
+/************************************************/
+void compressFiles(masterFileList *files, wordsList *words){
+	// files->fileName
+	DIR * dir;
+	struct dirent * entry;
+	char * fileContents;
+	errno = 0;
+	int errsv;
+	if((dir = opendir(dirName)) == NULL){
+		errsv = errno;
+		if(errsv == 2){
+			fprintf(stderr, "\nNo such file, directory, or improperly formed path: \"%s\".\n", dirName);
+			return words;
+		}
+		if(errsv == 20){
+			fileContents = extract(dirName);
+			if(fileContents == NULL){
+				return words;
+			}
+			words = tokenize2(fileContents, words, dirName);
+			free(fileContents);
+			return words;
+		}
+		return NULL;
+	}
+	while((entry = readdir(dir))){
+		// if it is a directory
+		if(entry->d_type == DT_DIR){
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
+			    continue;
+			}
+			else{
+				char *temp = concat(entry->d_name, "/");
+				char * path = concat(dirName, temp);
+				free(temp);
+				words = fileIterator(path, words);
+				free(path);
+			}
+		}
+		// if it is a normal file
+		else if(entry->d_type == DT_REG){
+			printPaths();
+			char * path = mkPath(dirName, entry->d_name);
+			fileContents = extract(path);
+			words = tokenize2(fileContents, words, entry->d_name);
+			free(fileContents);
+			free(path);
+		}
+		// if it is anything else
+		else{
+			char * path = mkPath(dirName, entry->d_name);
+			fprintf(stderr, "I don't know how to handle this entry. %s\n", path);
+			free(path);
+		}
+	}
+	closedir(dir);
+	return words;
+
+	if(files->next != NULL){
+		compressFiles(files->next);
+	}
+}
+
+/**
+	* Tokenizes the words that are passed to it.
+	*/
+treeNode * tokenize2(char * fileContents, wordsList *words, char * currentFile){
+	if(fileContents == NULL){
+		return words;
+	}
+	char * inputString = fileContents;
+	char * tempString;
+	int startingPos = -1;
+	int endingPos = 0;
+	int sizeOfString = 0;
+	int  len = 0;
+	int  i = 0;
+	len = strlen(inputString);
+	treeNode * tempNode;
+	fileList * tempLink;
+	for(i = 0; i <= len; i++){
+		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+			if(sizeOfString == 0){
+				continue;
+			}
+			else{
+				endingPos = i;
+				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
+				tempNode = createNode(tempString);
+				tempLink = createLinkNode(currentFile);
+				words = addToTree(words, tempNode, tempLink);
+				free(tempString);
+				startingPos = -1;
+				sizeOfString = 0;
+			}
+		}
+		else{
+			if(startingPos == -1){
+				startingPos = i;
+				sizeOfString++;
+			}
+			else{
+				sizeOfString++;
+			}
+		}
+	}
+	return head;
+}
+
 /************************************************/
 // Helping functions
 /************************************************/
@@ -829,7 +895,7 @@ void HuffmanCodes(unsigned size, int fd){
 	* @return result the concatenated string
 	*/
 char* concat(const char *s1, const char *s2){
-	char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+	char *result = malloc(strlen(s1) + strlen(s2) +1); // +1 for the null-terminator
 	strcpy(result, s1);
   strcat(result, s2);
   return result;

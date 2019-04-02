@@ -35,6 +35,11 @@ typedef struct MinHeap {
   struct treeNode** array;
 }MinHeap;
 
+typedef struct wordsList{
+	char *word;
+	struct wordsList *next;
+}wordsList;
+
 void lDestroy(fileList * fl);
 void tDestroy(treeNode * head);
 void finalOutput(treeNode * head, char * outputFileName);
