@@ -1,1 +1,5 @@
-Empty: Tried putting an empty file through it. It caught this and put out an error
+Empty: Tried putting an empty file through it. It caught this and put out an error.
+Locked: Tried putting in a file that it didn't have read access to and this was also caught and was given an error.
+Directory:Passed a directory with multiple files and this was handled with.
+Directory with sub directory: Was passed a directory that contained sub directories. This was also handled with. It was able to traverse down the subdirectories and go back up and open and read all the files. 
+Long Files: Was passed the entierty of Hamlet twice and was able to tokenize it all and compress it in a reasonable amount of time. 
