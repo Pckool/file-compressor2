@@ -1,6 +1,8 @@
 #ifndef ASST2_H
 #define ASST2_H
 
+#define COMP_EXT ".hcz"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -81,20 +83,24 @@ treeNode* buildHuffmanTree(treeNode **arr, int size);
 int printCodes(treeNode* root, char arr[], int top, char *rslt, int fd);
 
 void compressFiles(char *dirName);
-wordsList *scrubFiles(char *dirName, wordsList *words);
+wordsList *scrubFiles(char *dirName, wordsList *words, bitDict *dict);
 wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile);
 wordsList * createWordLink(char * newStr);
 wordsList *addToChain(wordsList *words, wordsList *newLink);
 void printChain(wordsList *words);
-void findCodebook(wordsList * words, char * outputFileName, char *codebookDir, char *outputDir);
+bitDict *findCodebook(wordsList * words, char * outputFileName);
 bitDict *addToDictChain(bitDict *dict, bitDict *newLink);
 bitDict * createDictLink(char * newStr, char *bits);
+void printDictChain(bitDict *dict);
 bitDict * tokenizeCodebook(char * fileContents, bitDict *dict);
 
+void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict);
+char *getCompressed(wordsList *words, bitDict *dict, char *str);
 
 char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);
 char* parseInt(const int num);
 unsigned int getLeafCount(treeNode* node);
 char *charAppend(char str[], char charr);
+const char *get_filename_ext(const char *filename);
 #endif

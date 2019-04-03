@@ -154,7 +154,8 @@ treeNode * tokenize(char * fileContents, treeNode * head, char * currentFile){
 	treeNode * tempNode;
 	fileList * tempLink;
 	for(i = 0; i <= len; i++){
-		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+		//if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+		if(isspace(inputString[i]) != 0){
 			if(sizeOfString == 0){
 				continue;
 			}
@@ -687,12 +688,6 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
         left = extractMin(minHeap);
         right = extractMin(minHeap);
 
-        // Step 3:  Create a new internal
-        // node with frequency equal to the
-        // sum of the two nodes frequencies.
-        // Make the two extracted node as
-        // left and right children of this new node.
-        // Add this node to the min heap
         // '$' is a special value for internal nodes, not used
         top = newNode("$", left->files->counter + right->files->counter);
 
@@ -701,8 +696,7 @@ treeNode* buildHuffmanTree(treeNode **arr, int size){
       insertMinHeap(minHeap, top);
     }
 
-    // Step 4: The remaining node is the
-    // root node and the tree is complete.
+    // tree is complete.
     return extractMin(minHeap);
 }
 
@@ -788,10 +782,12 @@ void HuffmanCodes(unsigned size, int fd){
 
 void compressFiles(char *dirName){
 	wordsList *words = NULL;
-	scrubFiles(dirName, words);
+		bitDict *dict = findCodebook(words, dirName);
+	scrubFiles(dirName, words, dict);
 }
-wordsList *scrubFiles(char *dirName, wordsList *words){
-	// files->fileName
+
+wordsList *scrubFiles(char *dirName, wordsList *words, bitDict *dict){
+
 	DIR * dir;
 	struct dirent * entry;
 	char * fileContents;
@@ -824,16 +820,21 @@ wordsList *scrubFiles(char *dirName, wordsList *words){
 				char *temp = concat(entry->d_name, "/");
 				char * path = concat(dirName, temp);
 				free(temp);
-				words = scrubFiles(path, words);
+				words = scrubFiles(path, words, dict);
 				free(path);
 			}
 		}
 		// if it is a normal file
 		else if(entry->d_type == DT_REG){
+			paths = addPath(dirName, entry->d_name, paths);
 			printPaths();
 			char * path = mkPath(dirName, entry->d_name);
+
 			fileContents = extract(path);
 			words = tokenize2(fileContents, words, entry->d_name);
+
+			// Compress the file found:
+			compressFile(dirName, entry->d_name, words, dict);
 			free(fileContents);
 			free(path);
 		}
@@ -869,7 +870,9 @@ wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile)
 	len = strlen(inputString);
 	wordsList * tempLink;
 	for(i = 0; i <= len; i++){
-		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+		// if it is not a letter or a digit
+		//if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
+		if(isspace(inputString[i]) != 0){
 			if(sizeOfString == 0){
 				continue;
 			}
@@ -877,6 +880,7 @@ wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile)
 				endingPos = i;
 				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
 				tempLink = createWordLink(tempString);
+
 				words = addToChain(words, tempLink);
 				free(tempString);
 				startingPos = -1;
@@ -893,53 +897,101 @@ wordsList * tokenize2(char * fileContents, wordsList *words, char * currentFile)
 			}
 		}
 	}
-	printChain(words);
+	// printChain(words);
 	return words;
 }
 
+void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict){
+	char *comFile = concat(fileName, COMP_EXT);
+
+	printf("New File Name: %s\n", comFile);
+	char *temp = malloc(2*sizeof(char));
+	strcpy(temp, "");
+
+	// printChain(words);
+	char *latestOutput = getCompressed(words, dict, temp);
+	printf("DATA: %s\n", latestOutput);
+}
+
+char *getCompressed(wordsList *words, bitDict *dict, char *str){
+	// if the current position i dict and the word we are looking at are the same
+	if(words != NULL && dict != NULL && strcmp(words->word, dict->token) == 0){
+		// add the bit representation from the dict into the string
+		char *temp = concat(str, dict->bits);
+		free(str);
+		printf("Data Currently: %s\n", temp);
+		// if there is another word
+		if(words->next != NULL)
+			return getCompressed(words->next, dict, temp);
+		// if there are no more words left return the string
+		else
+			return temp;
+	}
+	// if they aren't
+	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
+		if(dict->next != NULL)
+			return getCompressed(words, dict->next, str);
+	}
+	else{
+	}
+}
+
+
+/**
+	* This will take in the codebook and tokenize it into a bit dictionary, a structure that will allow easy compressions and decompression
+	*/
 bitDict * tokenizeCodebook(char * fileContents, bitDict *dict){
 	if(fileContents == NULL){
 		return dict;
 	}
 	char * inputString = fileContents;
-	char * tempString;
+	char * tempString = "";
+	char * tempBit = "";
 	int startingPos = -1;
 	int endingPos = 0;
 	int sizeOfString = 0;
 	int  len = 0;
 	int  i = 0;
 	len = strlen(inputString);
-	wordsList * tempLink;
+	bitDict * tempLink;
 	int side = 0;
+	// loop through the contents
 	for(i = 0; i <= len; i++){
-		if(isalpha(inputString[i]) == 0 && isdigit(inputString[i]) == 0){
-			if(sizeOfString == 0){
-				continue;
-			}
-			else{
-				endingPos = i;
-				tempString = pullString(startingPos, endingPos, sizeOfString, inputString);
-				tempLink = createDictLink(tempString, "11111");
-				dict = addToChain(dict, tempLink);
-				free(tempString);
-				startingPos = -1;
-				sizeOfString = 0;
-			}
+		// once we find \t then save that as a temp bit and switch side=1
+		if(inputString[i] == '\t' && side == 0 && i != 0){
+			++i;
+			side = 1;
 		}
+		else if(inputString[i] == '\n' && side == 1 && i != 0){
+
+			tempLink = createDictLink(tempString, tempBit);
+			dict = addToDictChain(dict, tempLink);
+			free(tempString);
+			free(tempBit);
+			tempString = "";
+			tempBit = "";
+			side = 0;
+		}
+		// if not a \t or a \n then save into one string with charAppend()
 		else{
-			if(startingPos == -1){
-				startingPos = i;
-				sizeOfString++;
+			// looking for bit rep
+			if(side == 0){
+				tempBit = charAppend(tempBit, inputString[i]);
 			}
-			else{
-				sizeOfString++;
+			// looking for token
+			else if(side == 1){
+				tempString = charAppend(tempString, inputString[i]);
 			}
+
 		}
 	}
-	printChain(dict);
-	return dict;
+	// printDictChain(dict);
+	return(dict);
 }
 
+/**
+	* Create a new link for a word chain
+	*/
 wordsList * createWordLink(char * newStr){
 
 	wordsList * temp = (wordsList*)malloc(sizeof(wordsList));
@@ -948,7 +1000,13 @@ wordsList * createWordLink(char * newStr){
 	return temp;
 }
 
+/**
+	*
+	*/
 wordsList *addToChain(wordsList *words, wordsList *newLink){
+	if(words == NULL){
+		return newLink;
+	}
 	if(words->next == NULL){
 		words->next = newLink;
 		return words;
@@ -958,14 +1016,22 @@ wordsList *addToChain(wordsList *words, wordsList *newLink){
 		return words;
 }
 
+/**
+	*
+	*/
 void printChain(wordsList *words){
 	if(words != NULL){
 		printf("%s\n", words->word);
 		if(words->next != NULL)
 			printChain(words->next);
 	}
+	else
+		printf("Null Words List...\n");
 }
 
+/**
+	* Create a new link for the bit dict chain
+	*/
 bitDict * createDictLink(char * newStr, char *bits){
 
 	bitDict * temp = (bitDict*)malloc(sizeof(bitDict));
@@ -975,49 +1041,48 @@ bitDict * createDictLink(char * newStr, char *bits){
 	return temp;
 }
 
+/**
+	*
+	*/
 bitDict *addToDictChain(bitDict *dict, bitDict *newLink){
+	if(dict == NULL)
+		return newLink;
 	if(dict->next == NULL){
 		dict->next = newLink;
 		return dict;
 	}
 	else
-		addToChain(dict->next, newLink);
+		addToDictChain(dict->next, newLink);
 		return dict;
 }
 
+void printDictChain(bitDict *dict){
+	if(dict != NULL){
+		printf("%s\t%s\n", dict->bits, dict->token);
+		if(dict->next != NULL)
+			printDictChain(dict->next);
+	}
+}
 
-void findCodebook(wordsList * words, char * outputFileName, char *codebookDir, char *outputDir){
+/**
+	*
+	*/
+bitDict *findCodebook(wordsList * words, char * codebookDir){
 	errno = 0;
 	int errsv;
 	int status = 0;
 	int amtToWrite;
 	char line[256];
-	int fd = open(codebookDir, O_RDONLY);
-
+	printf("%s\n", concat(codebookDir, "codebook"));
+	char *codebookPath = concat(codebookDir, "codebook");
+	int fd = open(codebookPath, O_RDONLY);
 	bitDict *dict = NULL;
-	char *raw_data = extract(codebookDir);
+	char *raw_data = extract(codebookPath);
 	dict = tokenizeCodebook(raw_data, dict);
-
+	// printDictChain(dict);
 	close(fd);
-	fd = open(outputFileName, O_WRONLY | O_APPEND | O_CREAT, 00700);
-	errsv = errno;
-	if(errsv == 13){
-		fprintf(stderr, "\nYou don't have access to file \"%s\"\n", outputFileName);
-		fprintf(stderr, "No output file can be written.\n");
-		return;
-	}
-	if(fd == -1){
-		fprintf(stderr, "\nError opening file \"%s\" to write our output.\n", outputFileName);
-		return;
-	}
-	if(words == NULL){
-		fprintf(stderr, "\nNo output, empty tree.\n");
-		fprintf(stderr, "There were no files in the directory, the files were ");
-		fprintf(stderr, "empty or access to the files wasn't grated.\n");
-		return;
-	}
-	// printTree(head, fd); //Change this line to writeBook one you are ready to test the programs ability to make codebooks
-	close(fd);
+	free(codebookPath);
+	return dict;
 }
 
 /************************************************/
@@ -1071,12 +1136,6 @@ char* parseInt(const int num){
 	* @return count number of nodes in the tree
 	*/
 unsigned int getLeafCount(treeNode* head){
-	// if(head == NULL)
-	// 	return 0;
-	// if(head->left == NULL && head->right==NULL)
-	// 	return 1;
-	// else
-	// 	return getLeafCount(head->left) + getLeafCount(head->right);
 	int c =  1;
     if (head ==NULL)
         return 0;
@@ -1088,7 +1147,12 @@ unsigned int getLeafCount(treeNode* head){
     }
 }
 
-//Adds char to the string that is being added to the codebook
+/**
+	* Adds char to the string that is being added to the codebook
+	* The way I implemented this is actually has the potential to create memory leaks.
+	* Thereason is because I can also pass a malloced string, and unless that is handled by the function that calles this, it will just abandon that original malloced string.
+	* If this isn't fixed I ran out of time.
+	*/
 char *charAppend(char str[], char charr){
 	char *newStr = malloc(strlen(str)+2);
 	strcpy(newStr, str);
