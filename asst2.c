@@ -917,7 +917,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 	// if the current position in dict and the word we are looking at are the same
 	if(words != NULL && dict != NULL && strcmp(words->word, dict->token) == 0){
 		// add the bit representation from the dict into the string
-		// printf("Found a match for : %s\n", words->word);
+		printf("Found a match for : %s\n", words->word);
 		char *temp = concat(str, dict->bits);
 		free(str);
 		printf("Data Currently: %s\n", temp);
