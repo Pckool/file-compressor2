@@ -908,9 +908,9 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 	char *temp = malloc(2*sizeof(char));
 	strcpy(temp, "");
 
-	printChain(words);
+	// printChain(words);
 	char *latestOutput = getCompressed(words, dict, dict, temp);
-	printf("DATA: %s\n", latestOutput);
+	printf("DATA: %s\n", &latestOutput);
 }
 
 char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
