@@ -925,8 +925,11 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		if(words->next != NULL)
 			return getCompressed(words->next, head, head, temp);
 		// if there are no more words left return the string
-		else
-			return temp;
+		else{
+			printf("WAIT BUT WHAT ABOUT %s\n", words->next->word);
+			return &temp;
+		}
+
 	}
 	// if they aren't
 	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
