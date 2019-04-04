@@ -913,6 +913,14 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 	printf("DATA: %s\n", latestOutput);
 }
 
+/**
+ * A recursive function to get the huffman compressed bits of the data given
+ * @param  words the linked list of words/data
+ * @param  dict  the linked list of tokens and bit representations generated earlier.
+ * @param  head  same as dict but not meant to be changed though the recusion
+ * @param  str   a starting string to work off of.
+ * @return       a string representing the bits of the given data.
+ */
 char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 	printf("one more lol...\n");
 	// if the current position in dict and the word we are looking at are the same
@@ -920,7 +928,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		// add the bit representation from the dict into the string
 		printf("Found a match for : %s\n", words->word);
 		char *temp = concat(str, dict->bits);
-		// free(str);
+		free(str);
 		printf("Data Currently: %s\n", temp);
 		// if there is another word
 		if(words->next != NULL){
@@ -935,13 +943,15 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 	}
 	// if they aren't
 	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
+		// if we still have more tokens in the dict
 		if(dict->next != NULL){
-			return getCompressed(words, dict->next, head, *str);
+			return getCompressed(words, dict->next, head, str);
 		}
+		// if we've reached the end of the dict
 		else{
 			printf("\"%s\" does not exist in the codebook...\n", words->word);
 			if(words->next != NULL)
-				return getCompressed(words->next, head, head, *str);
+				return getCompressed(words->next, head, head, str);
 			// if there are no more words left return the string
 			else{
 				return str;
