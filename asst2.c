@@ -910,7 +910,7 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 
 	// printChain(words);
 	char *latestOutput = getCompressed(words, dict, dict, temp);
-	printf("DATA: %s\n", &latestOutput);
+	printf("DATA: %s\n", latestOutput);
 }
 
 char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
@@ -920,7 +920,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		// printf("Found a match for : %s\n", words->word);
 		char *temp = concat(str, dict->bits);
 		free(str);
-		// printf("Data Currently: %s\n", temp);
+		printf("Data Currently: %s\n", temp);
 		// if there is another word
 		if(words->next != NULL)
 			return getCompressed(words->next, head, head, temp);
@@ -934,6 +934,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 			return getCompressed(words, dict->next, head, str);
 	}
 	else{
+		printf("I'm here for some reason...\n" );
 	}
 }
 
