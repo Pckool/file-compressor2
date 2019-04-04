@@ -922,7 +922,7 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
  * @return       a string representing the bits of the given data.
  */
 char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
-	printf("one more lol...\n");
+	printf("?\n");
 	// if the current position in dict and the word we are looking at are the same
 	if(words != NULL && dict != NULL && strcmp(words->word, dict->token) == 0){
 		// add the bit representation from the dict into the string
@@ -943,8 +943,10 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 	}
 	// if they aren't
 	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
+		printf("??\n");
 		// if we still have more tokens in the dict
 		if(dict->next != NULL){
+			printf("???\n");
 			return getCompressed(words, dict->next, head, str);
 		}
 		// if we've reached the end of the dict
@@ -965,7 +967,9 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 
 
 /**
-	* This will take in the codebook and tokenize it into a bit dictionary, a structure that will allow easy compressions and decompression
+	* This will take in the codebook and tokenize it into a bit dictionary, a structure that will allow easy compressions and decompression.
+	* @param fileContents a string of the contents of a file
+	* @param dict a bitDict to insert the data into.
 	*/
 bitDict * tokenizeCodebook(char * fileContents, bitDict *dict){
 	if(fileContents == NULL){
