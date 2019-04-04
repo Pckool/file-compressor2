@@ -919,7 +919,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		// add the bit representation from the dict into the string
 		printf("Found a match for : %s\n", words->word);
 		char *temp = concat(str, dict->bits);
-		// free(str);
+		free(str);
 		printf("Data Currently: %s\n", temp);
 		// if there is another word
 		if(words->next != NULL)
@@ -936,12 +936,11 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		if(dict->next != NULL)
 			return getCompressed(words, dict->next, head, str);
 		else{
-			printf("The %s does not exist in the codebook...\n", words->word);
+			printf("\"%s\" does not exist in the codebook...\n", words->word);
 			if(words->next != NULL)
 				return getCompressed(words->next, head, head, str);
 			// if there are no more words left return the string
 			else{
-				// printf("WAIT BUT WHAT ABOUT %s\n", words->next->word);
 				return str;
 			}
 		}
