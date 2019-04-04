@@ -1141,7 +1141,7 @@ char* concat(const char *s1, const char *s2){
 	* @param s2 The second string
 	* @return result the concatenated string
 	*/
-char* concat2(const char *s1, const char *s2){
+char* concat2(char *s1, char *s2){
 	char *result = (char*)realloc(s1, strlen(s1) + strlen(s2) +1); // +1 for the null-terminator
 	//strcpy(result, s1);
   	strcat(result, s2);
