@@ -929,12 +929,6 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 		fprintf(stderr, "\nError opening file \"%s\" to write our output.\n", comFile);
 		return;
 	}
-	if(head == NULL){
-		fprintf(stderr, "\nNo output, empty tree.\n");
-		fprintf(stderr, "There were no files in the directory, the files were ");
-		fprintf(stderr, "empty or access to the files wasn't grated.\n");
-		return;
-	}
 
 	if(write(fd, latestOutput, strlen(latestOutput) ) != strlen(latestOutput)){
 		char * err = "There was an error writing to";
