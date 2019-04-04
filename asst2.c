@@ -911,6 +911,36 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 	// printChain(words);
 	char *latestOutput = getCompressed(words, dict, dict, temp);
 	printf("DATA: %s\n", latestOutput);
+
+	errno = 0;
+	int errsv;
+	int status = 0;
+	char line[256];
+	int fd = open(comFile, O_RDONLY);
+	close(fd);
+	fd = open(comFile, O_WRONLY | O_APPEND | O_CREAT, 00700);
+	errsv = errno;
+	if(errsv == 13){
+		fprintf(stderr, "\nYou don't have access to file \"%s\"\n", comFile);
+		fprintf(stderr, "No output file can be written.\n");
+		return;
+	}
+	if(fd == -1){
+		fprintf(stderr, "\nError opening file \"%s\" to write our output.\n", comFile);
+		return;
+	}
+	if(head == NULL){
+		fprintf(stderr, "\nNo output, empty tree.\n");
+		fprintf(stderr, "There were no files in the directory, the files were ");
+		fprintf(stderr, "empty or access to the files wasn't grated.\n");
+		return;
+	}
+
+	if(write(fd, latestOutput, strlen(latestOutput) ) != strlen(latestOutput)){
+		char * err = "There was an error writing to";
+		printf("%s\n", concat(err, root->str));
+		return 1;
+	}
 }
 
 /**
