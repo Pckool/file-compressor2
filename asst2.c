@@ -929,7 +929,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		printf("????????????????\n");
 		printf("Found a match for : %s\n", words->word);
 		char *temp = concat2(str, dict->bits);
-		free(str);
+		// free(str);
 		printf("Data Currently: %s\n", temp);
 		// if there is another word
 		if(words->next != NULL){
