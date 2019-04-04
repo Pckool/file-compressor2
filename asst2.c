@@ -909,20 +909,21 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 	strcpy(temp, "");
 
 	// printChain(words);
-	char *latestOutput = getCompressed(words, dict, temp);
+	char *latestOutput = getCompressed(words, dict, dict, temp);
 	printf("DATA: %s\n", latestOutput);
 }
 
-char *getCompressed(wordsList *words, bitDict *dict, char *str){
-	// if the current position i dict and the word we are looking at are the same
+char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
+	// if the current position in dict and the word we are looking at are the same
 	if(words != NULL && dict != NULL && strcmp(words->word, dict->token) == 0){
 		// add the bit representation from the dict into the string
+		// printf("Found a match for : %s\n", words->word);
 		char *temp = concat(str, dict->bits);
 		free(str);
-		printf("Data Currently: %s\n", temp);
+		// printf("Data Currently: %s\n", temp);
 		// if there is another word
 		if(words->next != NULL)
-			return getCompressed(words->next, dict, temp);
+			return getCompressed(words->next, head, head, temp);
 		// if there are no more words left return the string
 		else
 			return temp;
@@ -930,7 +931,7 @@ char *getCompressed(wordsList *words, bitDict *dict, char *str){
 	// if they aren't
 	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
 		if(dict->next != NULL)
-			return getCompressed(words, dict->next, str);
+			return getCompressed(words, dict->next, head, str);
 	}
 	else{
 	}

@@ -95,7 +95,7 @@ void printDictChain(bitDict *dict);
 bitDict * tokenizeCodebook(char * fileContents, bitDict *dict);
 
 void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict);
-char *getCompressed(wordsList *words, bitDict *dict, char *str);
+char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str);
 
 char* concat(const char *s1, const char *s2);
 char* tabConcat(const char *s1, const char *s2);
