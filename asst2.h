@@ -103,4 +103,5 @@ char* parseInt(const int num);
 unsigned int getLeafCount(treeNode* node);
 char *charAppend(char str[], char charr);
 const char *get_filename_ext(const char *filename);
+char* concat2(const char *s1, const char *s2);
 #endif

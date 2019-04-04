@@ -928,7 +928,7 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		// add the bit representation from the dict into the string
 		printf("????????????????\n");
 		printf("Found a match for : %s\n", words->word);
-		char *temp = concat(str, dict->bits);
+		char *temp = concat2(str, dict->bits);
 		free(str);
 		printf("Data Currently: %s\n", temp);
 		// if there is another word
@@ -1128,10 +1128,24 @@ bitDict *findCodebook(wordsList * words, char * codebookDir){
 	* @return result the concatenated string
 	*/
 char* concat(const char *s1, const char *s2){
-	char *result = malloc(strlen(s1) + strlen(s2) +1); // +1 for the null-terminator
+	char *result = (char*)malloc(strlen(s1) + strlen(s2) +1); // +1 for the null-terminator
 	strcpy(result, s1);
   strcat(result, s2);
   return result;
+}
+
+
+/**
+	* a function to concatenate strings
+	* @param s1 the first string
+	* @param s2 The second string
+	* @return result the concatenated string
+	*/
+char* concat2(const char *s1, const char *s2){
+	char *result = (char*)realloc(s1, strlen(s1) + strlen(s2) +1); // +1 for the null-terminator
+	//strcpy(result, s1);
+  	strcat(result, s2);
+  	return result;
 }
 
 /**
@@ -1142,11 +1156,11 @@ char* concat(const char *s1, const char *s2){
 	*/
 char* tabConcat(const char *s1, const char *s2){
 	char *temp = concat(s1, "\t");
-  char *result = malloc(strlen(s1) + strlen(s2) + 2); // +1 for the null-terminator
-  strcpy(result, temp);
-  strcat(result, s2);
+  	char *result = malloc(strlen(s1) + strlen(s2) + 2); // +1 for the null-terminator
+  	strcpy(result, temp);
+  	strcat(result, s2);
 	free(temp);
-  return result;
+  	return result;
 }
 
 /**
