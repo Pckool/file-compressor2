@@ -931,8 +931,7 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 	}
 
 	if(write(fd, latestOutput, strlen(latestOutput) ) != strlen(latestOutput)){
-		char * err = "There was an error writing to";
-		printf("%s\n", concat(err, root->str));
+		printf("There was an error writing to\n");
 		return 1;
 	}
 }
