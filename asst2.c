@@ -922,11 +922,13 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 		free(str);
 		printf("Data Currently: %s\n", temp);
 		// if there is another word
-		if(words->next != NULL)
+		if(words->next != NULL){
+			printf("got here\n");
 			return getCompressed(words->next, head, head, temp);
+		}
+
 		// if there are no more words left return the string
 		else{
-			// printf("WAIT BUT WHAT ABOUT %s\n", words->next->word);
 			return temp;
 		}
 
