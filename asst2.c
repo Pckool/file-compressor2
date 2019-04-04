@@ -936,9 +936,10 @@ char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
 	// if they aren't
 	else if (words != NULL && dict != NULL && strcmp(words->word, dict->token) != 0){
 		printf("words didn't match...\n");
-		if(dict->next != NULL)
+		if(dict->next != NULL){
 			printf("boink...\n");
 			return getCompressed(words, dict->next, head, str);
+		}
 		else{
 			printf("\"%s\" does not exist in the codebook...\n", words->word);
 			if(words->next != NULL)
