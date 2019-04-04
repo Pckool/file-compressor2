@@ -914,6 +914,7 @@ void compressFile(char *dirName, char *fileName, wordsList *words, bitDict *dict
 }
 
 char *getCompressed(wordsList *words, bitDict *dict, bitDict *head, char *str){
+	printf("one more lol...\n");
 	// if the current position in dict and the word we are looking at are the same
 	if(words != NULL && dict != NULL && strcmp(words->word, dict->token) == 0){
 		// add the bit representation from the dict into the string
